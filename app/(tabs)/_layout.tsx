@@ -1,59 +1,64 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+const Layout = () => {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+    /**
+     * ここで、画面遷移を行うためのコンポーネントであるTabsを使用します。
+     * Tabsは、画面遷移を行うためのコンポーネントで.Screenコンポーネントを子要素に持ちます。
+     * また、Screenコンポーネントには、nameとcomponentの2つのプロパティを渡す必要があります。
+     * nameは、画面遷移を行うための名前で、componentは、画面遷移先のコンポーネントです。
+     * ここでは、nameにindexとarchiveを渡しています。
+     * また、componentには、それぞれ、ToDoListコンポーネントとArchiveListコンポーネントを渡しています。
+     * これで、画面遷移を行うためのコンポーネントを作成することができました。
+     * screenOptionsプロパティには、画面遷移を行うためのオプションを設定することができます。
+     */
+
+    /**
+      optionsプロパティには、画面遷移を行うためのオプションを設定することができます。
+      ここでは、headerShownプロパティにfalseを設定しています。
+      これで、ヘッダーを非表示にすることができました。
+      titleは、ヘッダーのタイトルを設定するためのプロパティです。
+      tabBarLabelは、タブのラベルを設定するためのプロパティです。
+      headerStyleは、ヘッダーのスタイルを設定するためのプロパティです。
+      tableIconは、タブのアイコンを設定するためのプロパティです。
+       */
+
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          headerShown: true,
+          title: "todo",
+          tabBarLabel: "todo",
+          headerStyle: { backgroundColor: "#005fff" },
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons
+              name="format-list-numbered"
+              size={24}
+              color={focused ? "#3b82f6" : "#374151"}
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="archive"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerShown: true,
+          title: "archive",
+          tabBarLabel: "archive",
+          headerStyle: { backgroundColor: "#005fff" },
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons
+              name="archive-arrow-down"
+              size={24}
+              color={focused ? "#3b82f6" : "#374151"}
+            />
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+
+export default Layout;
