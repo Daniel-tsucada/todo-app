@@ -1,62 +1,33 @@
 import { create } from "zustand";
+import { TodoItem } from "../model/todo";
 
-export interface TodoItem {
-  id: number; //ID
-  title: string; //タイトル
-  completed: boolean; //完了したかどうか
-  archived: boolean; //アーカイブされているかどうか
-}
-
-export interface State {
+interface TodoStore {
   todos: TodoItem[];
-  addTodo: (title: string) => void;
+  addTodo: (todo: TodoItem) => void;
+  archiveTodo: (id: number) => void;
   deleteTodo: (id: number) => void;
   toggleTodo: (id: number) => void;
-  archiveTodo: (id: number) => void;
-  nextId: number;
 }
 
-const useStore = create<State>((set) => ({
+const useTodoStore = create<TodoStore>((set) => ({
   todos: [],
-  nextId: 0,
-  addTodo: (title: string) =>
+  addTodo: (todo: TodoItem) =>
+    set((state) => ({ todos: [...state.todos, todo] })),
+  archiveTodo: (id: number) =>
     set((state) => ({
-      todos: state.todos.concat([
-        { id: state.nextId, title, completed: false, archived: false },
-      ]),
-      nextId: state.nextId + 1,
+      todos: state.todos.map((todo) =>
+        todo.id === id ? { ...todo, archived: true } : todo
+      ),
     })),
   deleteTodo: (id: number) =>
+    set((state) => ({ todos: state.todos.filter((todo) => todo.id !== id) })),
+  toggleTodo: (id: number) => {
     set((state) => ({
-      todos: state.todos.filter((todo) => todo.id !== id),
-    })),
-  toggleTodo: (id: number) =>
-    set((state) => {
-      const index = state.todos.findIndex((todo) => todo.id === id);
-      if (index !== -1) {
-        const newTodos = [...state.todos];
-        newTodos[index] = {
-          ...newTodos[index],
-          completed: !newTodos[index].completed,
-        };
-        return { todos: newTodos };
-      }
-      return state;
-    }),
-  archiveTodo: (id: number) =>
-    set((state) => {
-      const index = state.todos.findIndex((todo) => todo.id === id);
-      if (index !== -1) {
-        const newTodos = [...state.todos];
-        newTodos[index] = {
-          ...newTodos[index],
-          archived: true,
-          completed: true,
-        };
-        return { todos: newTodos };
-      }
-      return state;
-    }),
+      todos: state.todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      ),
+    }));
+  },
 }));
 
-export default useStore;
+export default useTodoStore;

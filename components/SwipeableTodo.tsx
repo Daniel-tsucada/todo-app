@@ -1,15 +1,8 @@
 import React, { memo } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TouchableHighlight,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import CheckBox from "expo-checkbox";
 import { Swipeable } from "react-native-gesture-handler";
-import { RectButton } from "react-native-gesture-handler";
-import { TodoItem } from "../store/store";
+import { TodoItem } from "../model/todo";
 
 const LeftActions = memo(
   ({
@@ -99,12 +92,10 @@ const SwipeableTodo = ({
         >
           {item.id + 1}. {item.title}
         </Text>
-        <TouchableOpacity>
-          <CheckBox
-            value={item.completed}
-            onValueChange={() => !archived && toggleTodo(item.id)}
-          />
-        </TouchableOpacity>
+        <CheckBox
+          value={item.completed}
+          onValueChange={() => !archived && toggleTodo(item.id)}
+        />
       </View>
     </Swipeable>
   );
@@ -117,7 +108,7 @@ const styles = StyleSheet.create({
   },
   todoTextCompleted: {
     textDecorationLine: "line-through",
-    color: "#BEBEBE",
+    color: "#696969",
   },
 });
 

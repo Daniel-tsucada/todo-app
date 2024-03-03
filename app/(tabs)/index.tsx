@@ -1,35 +1,42 @@
-import SwipeableTodo from "../../components/SwipeableTodo";
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   TextInput,
   Text,
-  TouchableWithoutFeedback,
-  Keyboard,
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import React, { useMemo } from "react";
-import useStore, { TodoItem } from "../../store/store";
+import SwipeableTodo from "../../components/SwipeableTodo";
+import useTodoStore from "../../store/store";
+import { TodoItem } from "../../model/todo";
 
 const Index = ({ archived = false }: { archived: boolean }) => {
-  const { toggleTodo, todos, archiveTodo } = useStore((state) => state);
-  const unarchivedTodos = useMemo(
+  const [nextId, setNextId] = useState(0);
+  const [input, setInput] = useState("");
+  const { toggleTodo, todos, archiveTodo } = useTodoStore((state) => state);
+  const activeTodos = useMemo(
     () => todos.filter((todo) => todo.archived === false),
     [todos]
   );
 
+  //アーカイブされた
   const handleArchive = (todo: TodoItem) => {
     archiveTodo(todo.id);
   };
 
-  const [input, setInput] = useState("");
+  const addTodo = useTodoStore((state) => state.addTodo);
 
-  const addTodo = useStore((state) => state.addTodo);
-
+  //trimメソッドは文字列の両端の空白を削除する
+  //文字数が0より大きい場合にnextIdをインクリメントして新しいTodoを追加
   const handleSubmit = () => {
     if (input.trim().length > 0) {
-      addTodo(input.trim());
+      setNextId(nextId + 1);
+      addTodo({
+        id: nextId,
+        title: input.trim(),
+        completed: false,
+        archived: false,
+      });
       setInput("");
     }
   };
@@ -41,54 +48,52 @@ const Index = ({ archived = false }: { archived: boolean }) => {
         width: "100%",
       }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginHorizontal: 20,
+          marginTop: 20,
+        }}
+      >
+        <TextInput
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginHorizontal: 20,
-            marginTop: 20,
+            borderWidth: 1,
+            borderColor: "blue",
+            borderRadius: 5,
+            padding: 10,
+            flex: 1,
+            marginRight: 10,
           }}
+          value={input}
+          onChangeText={setInput}
+          placeholder="Add a new todo..."
+        />
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#A4C6FF",
+            borderRadius: 5,
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+          }}
+          onPress={handleSubmit}
         >
-          <TextInput
+          <Text
             style={{
-              borderWidth: 1,
-              borderColor: "blue",
-              borderRadius: 5,
-              padding: 10,
-              flex: 1,
-              marginRight: 10,
+              fontSize: 18,
             }}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Add a new todo..."
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#A4C6FF",
-              borderRadius: 5,
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-            }}
-            onPress={handleSubmit}
           >
-            <Text
-              style={{
-                fontSize: 18,
-              }}
-            >
-              Add
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableWithoutFeedback>
+            Add
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         style={{
           marginTop: 20,
         }}
-        data={unarchivedTodos}
+        data={activeTodos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <SwipeableTodo
